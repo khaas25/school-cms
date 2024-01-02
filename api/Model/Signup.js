@@ -5,6 +5,10 @@ var authSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  adminStatus: {
+    type: String,
+    default: "pending"
+  },
   lastName: {
     type: String,
     required: true,
@@ -70,9 +74,7 @@ var authSchema = new mongoose.Schema({
   },
 });
 
-
-//! resets schema after set number of hours. 
-
+//! resets schema after set number of hours.
 
 // !  ==== Pre saving bcrypt will change pw to hash form
 authSchema.pre("save", async function (next) {

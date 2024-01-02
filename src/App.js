@@ -12,6 +12,8 @@ import Subheader from "./Components/Subheader";
 import EditPeriodInfo from "./Components/EditPeriodInfo";
 import AdminPanel from "./Components/AdminPanel";
 import Shuffling from "./Components/Shuffling";
+import Approval from "./Components/Approval";
+import Rejected from "./Components/Rejected";
 
 function App() {
   return (
@@ -101,6 +103,24 @@ function App() {
               <>
                 <Subheader title="Shuffle Students" />
                 <Shuffling />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/approval"
+            element={
+              <>
+                <Approval />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/rejected"
+            element={
+              <>
+                <Rejected />
                 <Footer />
               </>
             }

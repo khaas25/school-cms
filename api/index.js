@@ -408,16 +408,43 @@ app.get("/allShuffleStudentsTeachers", async (req, res) => {
   }
 });
 
+////==========find pendng admins===================
+app.get("/adminRequests", async (req, res) => {
+  try {
+    const findAdmins = await Signup.find({
+      adminStatus: "pending",
+      accountType: "admin",
+    });
+    res.status(200).send(findAdmins);
+  } catch {
+    res.status(500).send("Server Error");
+  }
+});
+
+//// admin requests for pending approval
+
+app.put("/adminRequests/:id", async (req, res) => {
+  try {
+    const _id = req.params.id;
+    const editUser = await Signup.findByIdAndUpdate(_id, req.body, {
+      new: true,
+    });
+    res.status(200).send(editUser);
+  } catch {
+    res.status(500).send("Server Crashed");
+  }
+});
+
 // //===============
-// setInterval(async () => {
-//   console.log("data deleted");
-//   await Signup.updateMany(
-//     {},
-//     {
-//       $unset: {
-//         absentStatus: "",
-//         shuffleStudents: "",
-//       },
-//     }
-//   );
-// }, 60000);
+setInterval(async () => {
+  console.log("data deleted");
+  await Signup.updateMany(
+    {},
+    {
+      $unset: {
+        absentStatus: "",
+        shuffleStudents: "",
+      },
+    }
+  );
+}, 43200000);

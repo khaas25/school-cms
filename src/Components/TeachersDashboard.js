@@ -9,10 +9,23 @@ import {
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 import { useReducer } from "react";
+import data from "../Config/Config";
+import CryptoJS from "crypto-js";
 
 // // ==============================================================
 export default function TeachersDashboard() {
+  const navigate = useNavigate();
   var [panelName, setPanelName] = useState("teachersPanel");
+
+  useEffect(() => {
+    var accountTypeCipher = localStorage.getItem("cms-accountType");
+    var bytes = CryptoJS.AES.decrypt(accountTypeCipher, data.secretKey);
+    var accountType = bytes.toString(CryptoJS.enc.Utf8);
+
+    if (accountType.toLowerCase() !== "teacher") {
+      navigate("/");
+    }
+  }, [navigate]);
 
   return (
     <>
@@ -53,9 +66,14 @@ export default function TeachersDashboard() {
 
 function ShuffleStudents() {
   var [shuffleArray, setShuffleArray] = useState([]);
-  var id = localStorage.getItem("user-id");
+  var idCipher = localStorage.getItem("user-id");
+  var bytes3 = CryptoJS.AES.decrypt(idCipher, data.secretKey);
+  var id = bytes3.toString(CryptoJS.enc.Utf8);
   var [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
-  var teacherName = localStorage.getItem("cms-userName");
+
+  var teacherNameCipher = localStorage.getItem("cms-userName");
+  var bytes = CryptoJS.AES.decrypt(teacherNameCipher, data.secretKey);
+  var teacherName = bytes.toString(CryptoJS.enc.Utf8);
 
   var [showEditBtn, setShowEditBtn] = useState(false);
 
@@ -256,7 +274,9 @@ function ShuffleStudents() {
 function PeriodData() {
   var [finalPeriods, setFinalPeriods] = useState([]);
   var [periodInfo, setPeriodInfo] = useState({});
-  var id = localStorage.getItem("user-id");
+  var idCipher = localStorage.getItem("user-id");
+  var bytes2 = CryptoJS.AES.decrypt(idCipher, data.secretKey);
+  var id = bytes2.toString(CryptoJS.enc.Utf8);
   var [periodNumber, setPeriodNumber] = useState(0);
   var [grade, setGrade] = useState(0);
 

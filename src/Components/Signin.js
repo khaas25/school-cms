@@ -3,12 +3,14 @@ import banner from "../images/logo.png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import CryptoJS from "crypto-js";
+import data from "../Config/Config";
 import {
   NotificationContainer,
   NotificationManager,
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
+
 // // ==============================================================
 export default function Signin() {
   var navigate = useNavigate();
@@ -32,19 +34,54 @@ export default function Signin() {
         NotificationManager.success("Login Successful");
         //if signin is successful the below items are displayed in localstorage
         localStorage.setItem("cms-login", true);
-        localStorage.setItem("cms-userName", res.data.firstName);
-        localStorage.setItem("cms-status", res.data.status);
-        localStorage.setItem("user-id", res.data._id);
-        localStorage.setItem("cms-accountType", res.data.accountType);
+        localStorage.setItem(
+          "cms-userName",
+          CryptoJS.AES.encrypt(res.data.firstName, data.secretKey)
+        );
+        localStorage.setItem(
+          "cms-status",
+          CryptoJS.AES.encrypt(res.data.status, data.secretKey)
+        );
+        localStorage.setItem(
+          "user-id",
+          CryptoJS.AES.encrypt(res.data._id, data.secretKey)
+        );
+        localStorage.setItem(
+          "cms-accountType",
+          CryptoJS.AES.encrypt(res.data.accountType, data.secretKey)
+        );
+        localStorage.setItem(
+          "cms-adminAccountStatus",
+          CryptoJS.AES.encrypt(res.data.adminStatus, data.secretKey)
+        );
         if (
           res.data.status === "incomplete" &&
           res.data.accountType === "teacher"
         ) {
           navigate("/teacherinfo");
-        } else if (res.data.accountType === "admin") {
+        } else if (
+          (res.data.accountType === "admin" &&
+            res.data.adminStatus === "approved") ||
+          res.data.accountType === "superadmin"
+        ) {
           navigate("/adminpanel");
-        } else {
+        } else if (
+          res.data.status === "complete" &&
+          res.data.accountType === "teacher"
+        ) {
           navigate("/teacherdashboard");
+        } else if (
+          res.data.accountType === "admin" &&
+          res.data.adminStatus === "pending"
+        ) {
+          navigate("/approval");
+        } else if (
+          res.data.accountType === "admin" &&
+          res.data.adminStatus === "rejected"
+        ) {
+          navigate("/rejected");
+        } else {
+          alert("Account not approved");
         }
       })
       .catch((e) => {

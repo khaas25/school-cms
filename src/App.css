@@ -928,6 +928,10 @@ th {
   background-color: #555;
   color: white;
 }
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #fff;
+  color: black;
+}
 
 .tab:focus {
   background-color: #555;
@@ -1213,4 +1217,52 @@ th {
 .emptyAdminShuffle h1 {
   color: #74bd43;
   padding-left: 80px;
+}
+
+.floorname-container {
+  background-color: #222222;
+  color: white;
+  padding: 30px;
+  width: 80%;
+  margin: auto;
+}
+.floorname-container h2 {
+  font-size: 50px;
+  font-weight: bolder;
+  text-align: center;
+  color: #74bd43;
+}
+
+.shufflestudents-admintabs {
+  margin-top: 0px;
+  border-radius: 0px;
+}
+
+.shufflestudents-admin-table {
+  border-radius: 0px;
+}
+
+.no-teacher-selected h1 {
+  color: #74bd43;
+  padding: 30px;
+}
+
+.approval-box {
+  /* background-color: #fff; */
+  /* background-color: #263951; */
+  background-color: #333;
+  margin-top: 100px;
+  color: #74bd43;
+  padding: 50px 20px 50px 20px;
+  width: 80%;
+  height: 400px;
+  text-align: center;
+  border: #74bd43 20px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.approval-box h2 {
+  font-size: 45px;
 }

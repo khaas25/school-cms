@@ -9,9 +9,31 @@ import absent2 from "../images/absent2.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useReducer } from "react";
+import approve from "../images/approve.png";
+import remove from "../images/remove.png";
+import CryptoJS from "crypto-js";
+import data from "../Config/Config";
 
 export default function AdminPanel() {
+  const navigate = useNavigate();
   var [panelName, setPanelName] = useState("teachersPanel");
+  var accountTypeCipher = localStorage.getItem("cms-accountType");
+
+  var bytes = CryptoJS.AES.decrypt(accountTypeCipher, data.secretKey);
+  var accountType = bytes.toString(CryptoJS.enc.Utf8);
+
+  useEffect(() => {
+    var accountTypeCipher = localStorage.getItem("cms-accountType");
+    var bytes = CryptoJS.AES.decrypt(accountTypeCipher, data.secretKey);
+    var accountType = bytes.toString(CryptoJS.enc.Utf8);
+
+    if (
+      accountType.toLowerCase() !== "admin" &&
+      accountType.toLowerCase() !== "superadmin"
+    ) {
+      navigate("/");
+    }
+  }, [navigate, accountType]);
 
   return (
     <>
@@ -28,7 +50,6 @@ export default function AdminPanel() {
         >
           Student Panel
         </button>
-
         <button
           className={
             panelName === "shuffleStudentsData" ? "tabs selected" : "tabs"
@@ -37,6 +58,18 @@ export default function AdminPanel() {
         >
           Shuffle Students
         </button>
+        {accountType === "superadmin" ? (
+          <>
+            <button
+              className={
+                panelName === "adminRequests" ? "tabs selected" : "tabs"
+              }
+              onClick={() => setPanelName("adminRequests")}
+            >
+              Admin Requests
+            </button>
+          </>
+        ) : null}
       </div>
       {panelName === "teachersPanel" ? (
         <>
@@ -47,14 +80,115 @@ export default function AdminPanel() {
         <>
           <StudentsPanel />
         </>
-      ) : (
+      ) : panelName === "shuffleStudentsData" ? (
         <>
           <ShuffleStudentsData />
         </>
+      ) : panelName === "adminRequests" ? (
+        <>
+          <AdminRequests />
+        </>
+      ) : (
+        <></>
       )}
     </>
   );
 }
+
+function AdminRequests() {
+  const [adminRequests, setAdminRequests] = useState([]);
+  const [update, forceUpdate] = useReducer((x) => x + 1, 0);
+  useEffect(() => {
+    async function getData() {
+      var response = await fetch("http://localhost:8080/adminRequests");
+      var data = await response.json();
+      console.log(data);
+      setAdminRequests(data);
+    }
+    getData();
+  }, [update]);
+
+  function updateStatus(val, id) {
+    var payload = {
+      adminStatus: val,
+    };
+    axios
+      .put("http://localhost:8080/adminRequests/" + id, payload)
+      .then((res) => {
+        NotificationManager.success("Admin Status Updated");
+        console.log(res);
+        forceUpdate();
+      })
+      .catch((e) => {
+        NotificationManager.success("Something went wrong!");
+        console.log(e);
+      });
+
+    forceUpdate();
+  }
+
+  var i = 0;
+  return (
+    <>
+      <div>
+        <NotificationContainer />
+        <div className="table-container admin-table">
+          <div className="student-admin">
+            {" "}
+            <h1>Admin Approval</h1>
+          </div>
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>SN#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th style={{ textAlign: "center" }}>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {adminRequests.map((item) => {
+                i++;
+                return (
+                  <>
+                    <tr>
+                      <td>{i}</td>
+                      <td>
+                        {item.firstName} {item.lastName}
+                      </td>
+                      <td>{item.email}</td>
+                      <td>{item.status}</td>
+                      <td style={{ textAlign: "center" }}>
+                        <img
+                          src={approve}
+                          width={40}
+                          alt="approve"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => updateStatus("approved", item._id)}
+                        />
+                        <img
+                          src={remove}
+                          width={40}
+                          alt="remove"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => updateStatus("rejected", item._id)}
+                        />
+                      </td>
+                    </tr>
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // //     ============ STUDENTS PANEL COMPONENT ===================
 
 function StudentsPanel() {
@@ -316,29 +450,39 @@ function ShuffleStudentsData() {
               {floorNames.map((fName) => {
                 return (
                   <>
-                    <h2>Students on floor {fName}</h2>
-                    <div className="admin_tabs">
+                    <div className="floorname-container">
+                      {" "}
+                      <h2>Students on floor {fName.toUpperCase()}</h2>
+                    </div>
+                    <div className="admin_tabs shufflestudents-admintabs">
+                      {/*Teacher Name Tabs*/}
                       {teachersData.map((tName) => {
-                        return (
-                          <button
-                            className={
-                              panelName ===
-                              `${tName.firstName};${tName.lastName}`
-                                ? "tabs selected"
-                                : "tabs"
-                            }
-                            onClick={() =>
-                              setPanelName(
+                        if (
+                          fName.toLowerCase() === tName.floorName.toLowerCase()
+                        ) {
+                          return (
+                            <button
+                              className={
+                                panelName ===
                                 `${tName.firstName};${tName.lastName}`
-                              )
-                            }
-                          >
-                            {tName.firstName} {tName.lastName}
-                          </button>
-                        );
+                                  ? "tabs selected"
+                                  : "tabs"
+                              }
+                              onClick={() =>
+                                setPanelName(
+                                  `${tName.firstName};${tName.lastName}`
+                                )
+                              }
+                            >
+                              {tName.firstName} {tName.lastName}
+                            </button>
+                          );
+                        } else {
+                          return null;
+                        }
                       })}
                     </div>
-                    <div className="table-container admin-table">
+                    <div className="table-container admin-table shufflestudents-admin-table">
                       <div className="teacher-admin">
                         {" "}
                         <h1>Shuffle Student's Information:</h1>
@@ -360,35 +504,46 @@ function ShuffleStudentsData() {
                             const lastName = item.lastName;
                             const floorName = item.floorName;
                             const roomNumber = item.roomNumber;
-                            return (
-                              <>
-                                {item.shuffleStudents.map((students) => {
-                                  const pNum = students.periodNumber;
-                                  return (
-                                    <>
-                                      {students.names.map((name) => {
-                                        i++;
-                                        return (
-                                          <>
-                                            <tr>
-                                              {" "}
-                                              <td>{i}</td>
-                                              <td>
-                                                {firstName + " " + lastName}
-                                              </td>
-                                              <td>{roomNumber}</td>
-                                              <td>{floorName}</td>
-                                              <td>{name.studentName}</td>
-                                              <td>{pNum}</td>
-                                            </tr>
-                                          </>
-                                        );
-                                      })}
-                                    </>
-                                  );
-                                })}
-                              </>
-                            );
+                            if (
+                              fName.toLowerCase() ===
+                              item.floorName.toLowerCase()
+                            ) {
+                              return (
+                                <>
+                                  {item.shuffleStudents.map((students) => {
+                                    const pNum = students.periodNumber;
+                                    return (
+                                      <>
+                                        {students.names.map((name) => {
+                                          i++;
+                                          return (
+                                            <>
+                                              <tr>
+                                                {" "}
+                                                <td>{i}</td>
+                                                <td>
+                                                  {firstName + " " + lastName}
+                                                </td>
+                                                <td>{roomNumber}</td>
+                                                <td>{floorName}</td>
+                                                <td>{name.studentName}</td>
+                                                <td>{pNum}</td>
+                                              </tr>
+                                            </>
+                                          );
+                                        })}
+                                      </>
+                                    );
+                                  })}
+                                </>
+                              );
+                            } else {
+                              return (
+                                <div className="no-teacher-selected">
+                                  <h1>Please choose a Teacher</h1>;
+                                </div>
+                              );
+                            }
                           })}
                         </tbody>
                       </table>

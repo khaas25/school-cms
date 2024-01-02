@@ -3,6 +3,7 @@ import logo from "../images/logo.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+
 export default function Navbar() {
   var navigate = useNavigate();
   var loginStatus = JSON.parse(localStorage.getItem("cms-login")); //use json.parse for boolean true or false values, otherwise dont.
@@ -13,6 +14,7 @@ export default function Navbar() {
     localStorage.removeItem("cms-status");
     localStorage.removeItem("user-id");
     localStorage.removeItem("cms-accountType");
+    localStorage.removeItem("cms-adminAccountStatus");
     navigate("/");
   }
 

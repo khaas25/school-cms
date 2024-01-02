@@ -7,10 +7,15 @@ import {
   NotificationManager,
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
+import data from "../Config/Config";
+import CryptoJS from "crypto-js";
 // // ==============================================================
 export default function PeriodInfo() {
   var navigate = useNavigate();
-  var id = localStorage.getItem("user-id");
+  var idCipher = localStorage.getItem("user-id");
+  var bytes3 = CryptoJS.AES.decrypt(idCipher, data.secretKey);
+  var id = bytes3.toString(CryptoJS.enc.Utf8);
+
   console.log(id);
   var location = useLocation();
   var [i, setI] = useState(0);
@@ -126,7 +131,6 @@ export default function PeriodInfo() {
         .catch(() => {
           NotificationManager.error("Could Not Update Data");
         });
-      alert("All Data Entered");
     }
   }, [i, finalPeriodNumbers.length, id, navigate]);
   // // ============RETURN SECTION==============

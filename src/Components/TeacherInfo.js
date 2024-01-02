@@ -6,10 +6,14 @@ import {
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 import { useNavigate } from "react-router-dom";
+import data from "../Config/Config";
+import CryptoJS from "crypto-js";
 // // ==============================================================
 export default function TeacherInfo() {
   var navigate = useNavigate();
-  var id = localStorage.getItem("user-id");
+  var idCipher = localStorage.getItem("user-id");
+  var bytes3 = CryptoJS.AES.decrypt(idCipher, data.secretKey);
+  var id = bytes3.toString(CryptoJS.enc.Utf8);
   //// ======= Start of Conference Number Function====================
   function conferenceNumber() {
     var num = document.getElementById("conferenceNumber").value;
