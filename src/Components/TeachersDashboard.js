@@ -11,6 +11,7 @@ import "react-notifications/lib/notifications.css";
 import { useReducer } from "react";
 import data from "../Config/Config";
 import CryptoJS from "crypto-js";
+import API from "../Config/Config";
 
 // // ==============================================================
 export default function TeachersDashboard() {
@@ -79,9 +80,7 @@ function ShuffleStudents() {
 
   useEffect(() => {
     async function getData() {
-      var response3 = await fetch(
-        "http://localhost:8080/shuffleStudents/" + id
-      );
+      var response3 = await fetch(`${API.apiUri}/shuffleStudents/` + id);
       var data3 = await response3.json();
       setShuffleArray(data3);
     }
@@ -93,7 +92,7 @@ function ShuffleStudents() {
     var date = new Date();
     var payload = { status };
     axios
-      .put(`http://localhost:8080/attendance/${id}/${studentId}`, payload)
+      .put(`${API.apiUri}/attendance/${id}/${studentId}`, payload)
       .then(() => {
         setShowEditBtn(false);
         var payload2 = {
@@ -111,7 +110,7 @@ function ShuffleStudents() {
         };
         console.log(payload2);
         axios
-          .post("http://localhost:8080/attendanceData", payload2)
+          .post(`${API.apiUri}/attendanceData`, payload2)
           .then(() => {
             NotificationManager.success("Attendance Marked Successfully");
           })
@@ -285,7 +284,7 @@ function PeriodData() {
   // // ==============================================================
   useEffect(() => {
     async function getData() {
-      var response = await fetch("http://localhost:8080/confPeriods/" + id);
+      var response = await fetch(`${API.apiUri}/confPeriods/` + id);
       var data = await response.json();
       console.log(data);
       var periodNumbers = [1, 2, 3, 4, 5, 6, 7];
@@ -297,7 +296,7 @@ function PeriodData() {
       setFinalPeriods(finalPeriodNumbers);
       ////  ==============================================================
       var response2 = await fetch(
-        `http://localhost:8080/periodInfo/${id}/${periodNumber}`
+        `${API.apiUri}/periodInfo/${id}/${periodNumber}`
       );
 
       if (periodNumber === 0) {

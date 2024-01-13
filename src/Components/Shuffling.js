@@ -8,6 +8,7 @@ import {
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 import { useNavigate } from "react-router-dom";
+import API from "../Config/Config";
 
 export default function Shuffling() {
   var navigate = useNavigate();
@@ -15,9 +16,10 @@ export default function Shuffling() {
   // absent teacher id below
   var teacherId = location.state.teacherId;
   var [teachers, setTeachers] = useState([]);
+
   useEffect(() => {
     async function getData() {
-      var response = await fetch("http://localhost:8080/teachers");
+      var response = await fetch(`${API.apiUri}/teachers`);
       var data = await response.json();
       setTeachers(data);
       console.log(data);
@@ -56,11 +58,11 @@ export default function Shuffling() {
       absentTeacherId: teacherId,
     };
     axios
-      .post("http://localhost:8080/shuffle", payload)
+      .post(`${API.apiUri}/shuffle`, payload)
       .then(() => {
         NotificationManager.success("Students Shuffled Successfully");
         axios
-          .put("http://localhost:8080/teacherinfo/" + teacherId, {
+          .put(`${API.apiUri}/teacherinfo/` + teacherId, {
             absentStatus: true,
           })
           .then((res) => {

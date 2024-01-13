@@ -10,6 +10,7 @@ import {
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 import { Link } from "react-router-dom";
+import API from "../Config/Config";
 export default function Signup() {
   var navigate = useNavigate();
 
@@ -61,7 +62,7 @@ export default function Signup() {
         "2px solid crimson";
     } else {
       axios
-        .post("http://localhost:8080/signup", payload)
+        .post(`${API.apiUri}/signup`, payload)
         .then(() => {
           NotificationManager.success("Signup Successful");
           navigate("/signin");

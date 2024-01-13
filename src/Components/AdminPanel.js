@@ -13,7 +13,7 @@ import approve from "../images/approve.png";
 import remove from "../images/remove.png";
 import CryptoJS from "crypto-js";
 import data from "../Config/Config";
-
+import Api from "../Config/Config";
 export default function AdminPanel() {
   const navigate = useNavigate();
   var [panelName, setPanelName] = useState("teachersPanel");
@@ -100,7 +100,7 @@ function AdminRequests() {
   const [update, forceUpdate] = useReducer((x) => x + 1, 0);
   useEffect(() => {
     async function getData() {
-      var response = await fetch("http://localhost:8080/adminRequests");
+      var response = await fetch(`${Api.apiUri}/adminRequests`);
       var data = await response.json();
       console.log(data);
       setAdminRequests(data);
@@ -113,7 +113,7 @@ function AdminRequests() {
       adminStatus: val,
     };
     axios
-      .put("http://localhost:8080/adminRequests/" + id, payload)
+      .put(`${Api.apiUri}/adminRequests/` + id, payload)
       .then((res) => {
         NotificationManager.success("Admin Status Updated");
         console.log(res);
@@ -200,7 +200,7 @@ function StudentsPanel() {
   useEffect(() => {
     async function getData() {
       var response = await fetch(
-        `http://localhost:8080/shuffleAttendance/` + formattedDate
+        `${Api.apiUri}/shuffleAttendance/` + formattedDate
       );
       var data = await response.json();
       console.log(data);
@@ -210,9 +210,7 @@ function StudentsPanel() {
   }, [formattedDate]);
   var i = 0;
   async function getDate(val) {
-    var response = await fetch(
-      `http://localhost:8080/shuffleAttendance/` + val
-    );
+    var response = await fetch(`${Api.apiUri}/shuffleAttendance/` + val);
     var data = await response.json();
     console.log(data);
     setStudents(data);
@@ -290,7 +288,7 @@ function TeachersPanel() {
   var [teachers, setTeachers] = useState([]);
   useEffect(() => {
     async function getData() {
-      var response = await fetch("http://localhost:8080/teachers");
+      var response = await fetch(`${Api.apiUri}/teachers`);
       var data = await response.json();
       console.log(data);
       setTeachers(data);
@@ -305,7 +303,7 @@ function TeachersPanel() {
   }
   function resetAll() {
     axios
-      .delete("http://localhost:8080/resetallattendance")
+      .delete(`${Api.apiUri}/resetallattendance`)
       .then(() => {
         NotificationManager.success("Attendance Reset Successful");
         closePopup();
@@ -409,9 +407,7 @@ function ShuffleStudentsData() {
 
   useEffect(() => {
     async function getData() {
-      var res2 = await fetch(
-        "http://localhost:8080/allShuffleStudentsTeachers"
-      );
+      var res2 = await fetch(`${Api.apiUri}/allShuffleStudentsTeachers`);
       var data2 = await res2.json();
       console.log(data2);
       setTeachersData(data2.filteredStudents);
@@ -425,7 +421,7 @@ function ShuffleStudentsData() {
   useEffect(() => {
     async function getPanelName() {
       var response = await fetch(
-        "http://localhost:8080/allShuffleStudents/" + panelName
+        `${Api.apiUri}/allShuffleStudents/` + panelName
       );
       var data = await response.json();
       console.log(data);

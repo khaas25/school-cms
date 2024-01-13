@@ -8,6 +8,7 @@ import "react-notifications/lib/notifications.css";
 import { useNavigate } from "react-router-dom";
 import data from "../Config/Config";
 import CryptoJS from "crypto-js";
+import API from "../Config/Config";
 // // ==============================================================
 export default function TeacherInfo() {
   var navigate = useNavigate();
@@ -65,7 +66,7 @@ export default function TeacherInfo() {
     };
 
     axios
-      .put("http://localhost:8080/teacherinfo/" + id, payload)
+      .put(`${API.apiUri}/teacherinfo/` + id, payload)
       .then((res) => {
         NotificationManager.success("Data Added!");
         console.log(res);

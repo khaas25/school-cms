@@ -10,6 +10,7 @@ import {
   NotificationManager,
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
+import API from "../Config/Config";
 
 // // ==============================================================
 export default function Signin() {
@@ -29,7 +30,7 @@ export default function Signin() {
     };
 
     axios
-      .post("http://localhost:8080/signin", payload)
+      .post(`${API.apiUri}/signin`, payload)
       .then((res) => {
         NotificationManager.success("Login Successful");
         //if signin is successful the below items are displayed in localstorage
