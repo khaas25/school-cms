@@ -1266,3 +1266,9 @@ th {
 .approval-box h2 {
   font-size: 45px;
 }
+
+.empty-text {
+  color: #74bd43 !important;
+  text-align: center;
+  padding: 20px;
+}

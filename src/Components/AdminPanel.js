@@ -14,6 +14,7 @@ import remove from "../images/remove.png";
 import CryptoJS from "crypto-js";
 import data from "../Config/Config";
 import Api from "../Config/Config";
+import Switch from "react-switch";
 export default function AdminPanel() {
   const navigate = useNavigate();
   var [panelName, setPanelName] = useState("teachersPanel");
@@ -68,6 +69,14 @@ export default function AdminPanel() {
             >
               Admin Requests
             </button>
+            <button
+              className={
+                panelName === "manageTeachers" ? "tabs selected" : "tabs"
+              }
+              onClick={() => setPanelName("manageTeachers")}
+            >
+              Manage Teachers
+            </button>
           </>
         ) : null}
       </div>
@@ -88,6 +97,10 @@ export default function AdminPanel() {
         <>
           <AdminRequests />
         </>
+      ) : panelName === "manageTeachers" ? (
+        <>
+          <ManageTeachers />
+        </>
       ) : (
         <></>
       )}
@@ -98,16 +111,22 @@ export default function AdminPanel() {
 function AdminRequests() {
   const [adminRequests, setAdminRequests] = useState([]);
   const [update, forceUpdate] = useReducer((x) => x + 1, 0);
+  const [admins, setAdmins] = useState([]);
   useEffect(() => {
     async function getData() {
       var response = await fetch(`${Api.apiUri}/adminRequests`);
       var data = await response.json();
+
+      var responseAdmin = await fetch(`${Api.apiUri}/admins`);
+      var dataAdmin = await responseAdmin.json();
       console.log(data);
+      setAdmins(dataAdmin);
       setAdminRequests(data);
     }
     getData();
   }, [update]);
-
+  let adminId;
+  let adminStatusValue;
   function updateStatus(val, id) {
     var payload = {
       adminStatus: val,
@@ -126,7 +145,33 @@ function AdminRequests() {
 
     forceUpdate();
   }
+  function updateStatusForManageAdmins() {
+    var payload = {
+      adminStatus: adminStatusValue,
+    };
+    axios
+      .put(`${Api.apiUri}/adminRequests/` + adminId, payload)
+      .then((res) => {
+        NotificationManager.success("Admin Status Updated");
+        console.log(res);
+        forceUpdate();
+        closePopup();
+      })
+      .catch((e) => {
+        NotificationManager.success("Something went wrong!");
+        console.log(e);
+      });
 
+    forceUpdate();
+  }
+  function showPopup(val, id) {
+    adminStatusValue = val;
+    adminId = id;
+    document.getElementById("pop-up").style.visibility = "visible";
+  }
+  function closePopup() {
+    document.getElementById("pop-up").style.visibility = "hidden";
+  }
   var i = 0;
   return (
     <>
@@ -148,41 +193,133 @@ function AdminRequests() {
                 <th style={{ textAlign: "center" }}>Action</th>
               </tr>
             </thead>
-
             <tbody>
-              {adminRequests.map((item) => {
-                i++;
-                return (
-                  <>
-                    <tr>
-                      <td>{i}</td>
-                      <td>
-                        {item.firstName} {item.lastName}
-                      </td>
-                      <td>{item.email}</td>
-                      <td>{item.status}</td>
-                      <td style={{ textAlign: "center" }}>
-                        <img
-                          src={approve}
-                          width={40}
-                          alt="approve"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => updateStatus("approved", item._id)}
-                        />
-                        <img
-                          src={remove}
-                          width={40}
-                          alt="remove"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => updateStatus("rejected", item._id)}
-                        />
-                      </td>
-                    </tr>
-                  </>
-                );
-              })}
+              {adminRequests.length > 0 ? (
+                <>
+                  {adminRequests.map((item) => {
+                    i++;
+                    return (
+                      <>
+                        <tr>
+                          <td>{i}</td>
+                          <td>
+                            {item.firstName} {item.lastName}
+                          </td>
+                          <td>{item.email}</td>
+                          <td>{item.status}</td>
+                          <td style={{ textAlign: "center" }}>
+                            <img
+                              src={approve}
+                              width={40}
+                              alt="approve"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => updateStatus("approved", item._id)}
+                            />
+                            <img
+                              src={remove}
+                              width={40}
+                              alt="remove"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => updateStatus("rejected", item._id)}
+                            />
+                          </td>
+                        </tr>
+                      </>
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  <tr style={{ backgroundColor: "#333" }}>
+                    <td colspan="5">
+                      <div className="emptyHeadingContainer">
+                        <h1 className="empty-text">No Admin Requests</h1>
+                      </div>
+                    </td>
+                  </tr>
+                </>
+              )}
             </tbody>
           </table>
+          <div className="student-admin">
+            {" "}
+            <h1>Manage Admins</h1>
+          </div>
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>SN#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th style={{ textAlign: "center" }}>Remove</th>
+
+                {/* MAP DATA THROUGH TABLE */}
+              </tr>
+            </thead>
+            <tbody>
+              {admins.length > 0 ? (
+                <>
+                  {admins.map((item) => {
+                    i++;
+                    return (
+                      <>
+                        <tr>
+                          <td>{i}</td>
+                          <td>
+                            {item.firstName} {item.lastName}
+                          </td>
+                          <td>{item.email}</td>
+                          <td>{item.adminStatus}</td>
+                          <td style={{ textAlign: "center" }}>
+                            {" "}
+                            <img
+                              src={remove}
+                              alt="reject"
+                              width={40}
+                              onClick={() => showPopup("removed", item._id)}
+                              style={{ cursor: "pointer" }}
+                            />
+                          </td>
+                        </tr>
+                      </>
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  <tr style={{ backgroundColor: "#333" }}>
+                    <td colspan="5">
+                      <div className="emptyHeadingContainer">
+                        <h1 className="empty-text">No Active Admins</h1>
+                      </div>
+                    </td>
+                  </tr>
+                </>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="overlay">
+          <div className="pop-up" id="pop-up">
+            <h1>Are you sure you want to remove this admin?</h1>{" "}
+            <p>
+              This action is not reversible. Once the admin is removed the
+              account is removed permanently.
+            </p>
+            <div className="popUp-btn-container">
+              <button
+                className="confirm-popup"
+                onClick={updateStatusForManageAdmins}
+              >
+                Confirm
+              </button>
+              <button className="cancel-popup" onClick={closePopup}>
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </>
@@ -316,7 +453,7 @@ function TeachersPanel() {
     forceUpdate();
   }
 
-  function showPopup() {
+  function showPopup(val, id) {
     document.getElementById("pop-up").style.visibility = "visible";
   }
   function closePopup() {
@@ -560,5 +697,121 @@ function ShuffleStudentsData() {
         )}
       </>
     </div>
+  );
+}
+
+function ManageTeachers() {
+  var navigate = useNavigate();
+  var [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  var [teachers, setTeachers] = useState([]);
+
+  var [checked, setChecked] = useState(true);
+  useEffect(() => {
+    async function getData() {
+      var response = await fetch(`${Api.apiUri}/teachers`);
+      var data = await response.json();
+      console.log(data);
+      setTeachers(data);
+    }
+    getData();
+  }, [ignored]);
+
+  var i = 0;
+
+  function shuffleStudents(id) {
+    navigate("/shuffle", { state: { teacherId: id } });
+  }
+  function resetAll() {
+    axios
+      .delete(`${Api.apiUri}/resetallattendance`)
+      .then(() => {
+        NotificationManager.success("Attendance Reset Successful");
+        closePopup();
+        forceUpdate();
+      })
+      .catch((e) => {
+        NotificationManager.error("Something went wrong");
+        console.log(e);
+      });
+    forceUpdate();
+  }
+
+  function showPopup() {
+    document.getElementById("pop-up").style.visibility = "visible";
+  }
+  function closePopup() {
+    document.getElementById("pop-up").style.visibility = "hidden";
+  }
+  return (
+    <>
+      <NotificationContainer />
+      <div>
+        {" "}
+        <div className="table-container admin-table">
+          <div className="teacher-admin">
+            {" "}
+            <h1>Teacher Information:</h1>
+            <button onClick={showPopup}>Reset All Attendance Data</button>
+          </div>
+          <br />
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>SN#</th>
+                <th>Teacher Name</th>
+                <th>Building Location</th>
+                <th>Room Number</th>
+                <th>Email</th>
+                <th>Account Status</th>
+                <th>Manage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {teachers?.map((item) => {
+                if (item.absentStatus !== true) {
+                  ++i;
+                  return (
+                    <tr>
+                      <td>{i}</td>
+                      <td>
+                        {item.firstName} {item.lastName}
+                      </td>
+                      <td>{item.floorName.toUpperCase()}</td>
+                      <td>{item.roomNumber}</td>
+
+                      <td>{item.email}</td>
+                      <td>{item.teacherStatus.toUpperCase()}</td>
+                      <td style={{ textAlign: "center", cursor: "pointer" }}>
+                        <Switch checked={true} />
+                      </td>
+                    </tr>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="overlay">
+          <div className="pop-up" id="pop-up">
+            <h1>Are you sure you want to reset all data</h1>{" "}
+            <p>
+              This action will delete all the shuffle data. Please click confirm
+              to proceed.
+            </p>
+            <div className="popUp-btn-container">
+              <button className="confirm-popup" onClick={resetAll}>
+                Confirm
+              </button>
+              <button className="cancel-popup" onClick={closePopup}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
