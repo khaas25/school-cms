@@ -42,12 +42,14 @@ export default function AdminPanel() {
         <button
           className={panelName === "teachersPanel" ? "tabs selected" : "tabs"}
           onClick={() => setPanelName("teachersPanel")}
+          id="tab-bars"
         >
           Teacher Panel
         </button>
         <button
           className={panelName === "studentsPanel" ? "tabs selected" : "tabs"}
           onClick={() => setPanelName("studentsPanel")}
+          id="tab-bars"
         >
           Student Panel
         </button>
@@ -56,6 +58,7 @@ export default function AdminPanel() {
             panelName === "shuffleStudentsData" ? "tabs selected" : "tabs"
           }
           onClick={() => setPanelName("shuffleStudentsData")}
+          id="tab-bars"
         >
           Shuffle Students
         </button>
@@ -66,6 +69,7 @@ export default function AdminPanel() {
                 panelName === "adminRequests" ? "tabs selected" : "tabs"
               }
               onClick={() => setPanelName("adminRequests")}
+              id="tab-bars"
             >
               Admin Requests
             </button>
@@ -74,6 +78,7 @@ export default function AdminPanel() {
                 panelName === "manageTeachers" ? "tabs selected" : "tabs"
               }
               onClick={() => setPanelName("manageTeachers")}
+              id="tab-bars"
             >
               Manage Teachers
             </button>
@@ -468,7 +473,9 @@ function TeachersPanel() {
           <div className="teacher-admin">
             {" "}
             <h1>Teacher Information:</h1>
-            <button onClick={showPopup}>Reset All Attendance Data</button>
+            <button onClick={showPopup} className="admin-panel-btn">
+              Reset All Attendance Data
+            </button>
           </div>
           <br />
           <table class="table table-striped">
@@ -699,12 +706,14 @@ function ShuffleStudentsData() {
     </div>
   );
 }
+// //     ============ MANAGE TEACHERS COMPONENT ===================
 
 function ManageTeachers() {
   var navigate = useNavigate();
   var [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
 
   var [teachers, setTeachers] = useState([]);
+  // var [removeId, setRemoveId] = useState();
 
   var [checked, setChecked] = useState(true);
   useEffect(() => {
@@ -717,45 +726,65 @@ function ManageTeachers() {
     getData();
   }, [ignored]);
 
-  var i = 0;
-
-  function shuffleStudents(id) {
-    navigate("/shuffle", { state: { teacherId: id } });
-  }
-  function resetAll() {
+  let teacherStatusValue;
+  let teacherId;
+  function updateStatus(id, currentStatus) {
+    var payload = { teacherStatus: !currentStatus };
+    console.log(payload);
+    // exclamation point mean set to opposite
     axios
-      .delete(`${Api.apiUri}/resetallattendance`)
-      .then(() => {
-        NotificationManager.success("Attendance Reset Successful");
-        closePopup();
+      .put(`${Api.apiUri}/adminRequests/` + id, payload)
+      .then((res) => {
+        NotificationManager.success("Teacher Status Updated");
+        console.log(res);
         forceUpdate();
       })
       .catch((e) => {
-        NotificationManager.error("Something went wrong");
+        NotificationManager.error("Something went wrong!");
         console.log(e);
       });
     forceUpdate();
   }
 
-  function showPopup() {
+  function removeTeacher() {
+    var payload = { status: teacherStatusValue };
+    axios
+      .put(`${Api.apiUri}/adminRequests/` + teacherId, payload)
+      .then((res) => {
+        NotificationManager.success("Teacher Removed");
+        console.log(res);
+        forceUpdate();
+        closePopup();
+      })
+      .catch((e) => {
+        NotificationManager.error("Something went wrong!");
+        console.log(e);
+      });
+    forceUpdate();
+  }
+  function showPopup(val, id) {
+    teacherStatusValue = val;
+    teacherId = id;
     document.getElementById("pop-up").style.visibility = "visible";
   }
   function closePopup() {
     document.getElementById("pop-up").style.visibility = "hidden";
   }
+  var i = 0;
+
   return (
     <>
       <NotificationContainer />
       <div>
         {" "}
-        <div className="table-container admin-table">
+        <div className="table-container admin-table admin-table-manage-teachers">
           <div className="teacher-admin">
             {" "}
             <h1>Teacher Information:</h1>
-            <button onClick={showPopup}>Reset All Attendance Data</button>
+            {/* <button onClick={showPopup}>Reset All Attendance Data</button> */}
           </div>
           <br />
-          <table class="table table-striped">
+          <table class="table table-striped table-manage-teachers">
             <thead>
               <tr>
                 <th>SN#</th>
@@ -765,6 +794,7 @@ function ManageTeachers() {
                 <th>Email</th>
                 <th>Account Status</th>
                 <th>Manage</th>
+                <th>Remove</th>
               </tr>
             </thead>
             <tbody>
@@ -781,9 +811,29 @@ function ManageTeachers() {
                       <td>{item.roomNumber}</td>
 
                       <td>{item.email}</td>
-                      <td>{item.teacherStatus.toUpperCase()}</td>
+                      <td>{item.teacherStatus ? "ACTIVE" : "INACTIVE"}</td>
                       <td style={{ textAlign: "center", cursor: "pointer" }}>
-                        <Switch checked={true} />
+                        <Switch
+                          checked={item.teacherStatus}
+                          onChange={() =>
+                            updateStatus(item._id, item.teacherStatus)
+                          }
+                        />
+                      </td>
+                      <td
+                        style={{
+                          textAlign: "center",
+                        }}
+                      >
+                        <img
+                          src={remove}
+                          alt="removeteacher"
+                          width={40}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            showPopup("removed", item._id);
+                          }}
+                        />
                       </td>
                     </tr>
                   );
@@ -796,13 +846,13 @@ function ManageTeachers() {
         </div>
         <div className="overlay">
           <div className="pop-up" id="pop-up">
-            <h1>Are you sure you want to reset all data</h1>{" "}
+            <h1>Are you sure you want to delete this user?</h1>{" "}
             <p>
-              This action will delete all the shuffle data. Please click confirm
-              to proceed.
+              This action will permanently delete this user. Please click
+              confirm to proceed.
             </p>
             <div className="popUp-btn-container">
-              <button className="confirm-popup" onClick={resetAll}>
+              <button className="confirm-popup" onClick={removeTeacher}>
                 Confirm
               </button>
               <button className="cancel-popup" onClick={closePopup}>

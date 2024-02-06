@@ -14,6 +14,7 @@ import AdminPanel from "./Components/AdminPanel";
 import Shuffling from "./Components/Shuffling";
 import Approval from "./Components/Approval";
 import Rejected from "./Components/Rejected";
+import Inactive from "./Components/Inactive";
 
 function App() {
   return (
@@ -121,6 +122,15 @@ function App() {
             element={
               <>
                 <Rejected />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/inactive"
+            element={
+              <>
+                <Inactive />
                 <Footer />
               </>
             }

@@ -2,7 +2,10 @@ import React from "react";
 import logo from "../images/logo.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useEffect } from "react";
 
 export default function Navbar() {
   var navigate = useNavigate();
@@ -18,15 +21,32 @@ export default function Navbar() {
     navigate("/");
   }
 
+  var navLinks = "";
+  useEffect(() => {
+    navLinks = document.getElementById("navLinks");
+  }, []);
+
+  function showMenu() {
+    navLinks.style.right = "0";
+  }
+
+  function hideMenu() {
+    navLinks.style.right = "-200px";
+  }
+
   return (
     <div>
       <nav>
         <Link to="/">
-          <img src={logo} alt="logo" />
+          <img src={logo} alt="logo" className="nav-logo" />
         </Link>
-
         <div className="nav-links" id="navLinks">
-          <i className="fa-solid fa-xmark" onclick="hideMenu()"></i>
+          {/* <i className="fa-solid fa-xmark" onclick={hideMenu}></i> */}
+          <FontAwesomeIcon
+            icon={faXmark}
+            className="fa-solid fa-xmark"
+            onClick={hideMenu}
+          />
 
           <ul>
             {/* =============================================== */}
@@ -59,8 +79,12 @@ export default function Navbar() {
             {/* =============================================== */}
           </ul>
         </div>
-
-        <i className="fa-solid fa-bars"></i>
+        <FontAwesomeIcon
+          className="fa-solid fa-bars"
+          icon={faBars}
+          onClick={showMenu}
+        />
+        {/* // <i className="fa-solid fa-bars" onClick={showMenu}></i> */}
       </nav>
     </div>
   );

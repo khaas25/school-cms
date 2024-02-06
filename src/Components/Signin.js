@@ -32,6 +32,7 @@ export default function Signin() {
     axios
       .post(`${API.apiUri}/signin`, payload)
       .then((res) => {
+        console.log(res);
         NotificationManager.success("Login Successful");
         //if signin is successful the below items are displayed in localstorage
         localStorage.setItem("cms-login", true);
@@ -55,7 +56,9 @@ export default function Signin() {
           "cms-adminAccountStatus",
           CryptoJS.AES.encrypt(res.data.adminStatus, data.secretKey)
         );
-        if (
+        if (!res.data.teacherStatus) {
+          navigate("/inactive");
+        } else if (
           res.data.status === "incomplete" &&
           res.data.accountType === "teacher"
         ) {
@@ -105,10 +108,10 @@ export default function Signin() {
     <div>
       <NotificationContainer />
       <div className="wrapper">
-        <div className="inner">
+        <div className="inner signin-inner">
           {/* =================================================== */}
           <div className="image-holder">
-            <img src={banner} alt="banner" />
+            <img src={banner} alt="banner" className="signin-logo" />
           </div>
           {/* =================================================== */}
           <form action="" onSubmit={signIn}>
