@@ -226,6 +226,7 @@ export default function Shuffling() {
         </div>
       </div>
       <button onClick={shuffleStudents}>Shuffle Students</button>
+      <button onClick={() => navigate("/adminPanel")}>CANCEL</button>
     </div>
   );
 }

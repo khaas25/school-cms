@@ -193,6 +193,13 @@ export default function EditPeriodInfo() {
 
             <div className="btn-container">
               <button type="submit">Save</button>
+              <button
+                type="submit"
+                className="btn-cancel"
+                onClick={() => navigate("/teacherdashboard")}
+              >
+                Cancel
+              </button>
             </div>
 
             <br />

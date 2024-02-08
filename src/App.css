@@ -1166,7 +1166,7 @@ th {
   color: white;
 }
 .pop-up {
-  width: 600px;
+  max-width: 600px;
   padding: 40px;
   background-color: #333;
   color: white;
@@ -1253,6 +1253,14 @@ th {
   padding: 30px;
 }
 
+.btn-cancel {
+  border-color: crimson;
+  color: crimson;
+}
+.btn-cancel:hover {
+  background-color: crimson;
+  color: white;
+}
 .approval-box {
   /* background-color: #fff; */
   /* background-color: #263951; */
@@ -1278,7 +1286,9 @@ th {
   text-align: center;
   padding: 20px;
 }
-
+.btn-container {
+  gap: 20px;
+}
 @media screen and (max-width: 1000px) {
   .admin-table,
   .admin_tabs,
@@ -1289,6 +1299,13 @@ th {
   }
   .periodData-Container {
     padding: 0px;
+  }
+  .teacher-container {
+    flex-wrap: wrap;
+    width: 95%;
+  }
+  .shuffle_container {
+    width: 95%;
   }
 }
 
@@ -1351,4 +1368,20 @@ th {
   .signin-inner {
     width: 95%;
   }
+  .shuffle_container div {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .pop-up {
+    width: 80%;
+  }
+  .pop-up button {
+    transform: scale(0.8);
+  }
+}
+
+.popUp-btn-container {
+  gap: 20px;
 }

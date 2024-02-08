@@ -332,7 +332,6 @@ function AdminRequests() {
 }
 
 // //     ============ STUDENTS PANEL COMPONENT ===================
-
 function StudentsPanel() {
   var [students, setStudents] = useState([]);
   var date = new Date();
@@ -409,10 +408,15 @@ function StudentsPanel() {
               </>
             ) : (
               <>
-                <div className="emptyHeadingContainer">
-                  {" "}
-                  <h1 className="empty-heading">No Data Found!</h1>
-                </div>
+                <>
+                  <tr style={{ backgroundColor: "#333" }}>
+                    <td colspan="6">
+                      <div className="emptyHeadingContainer">
+                        <h1 className="empty-text">No Data Found</h1>
+                      </div>
+                    </td>
+                  </tr>
+                </>
               </>
             )}
           </table>
@@ -422,7 +426,6 @@ function StudentsPanel() {
   );
 }
 // //     ============ TEACHERS PANEL COMPONENT ===================
-
 function TeachersPanel() {
   var navigate = useNavigate();
   var [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
@@ -707,7 +710,6 @@ function ShuffleStudentsData() {
   );
 }
 // //     ============ MANAGE TEACHERS COMPONENT ===================
-
 function ManageTeachers() {
   var navigate = useNavigate();
   var [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
