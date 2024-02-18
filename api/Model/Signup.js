@@ -71,6 +71,7 @@ var authSchema = new mongoose.Schema({
         },
       ],
       periodNumber: { type: Number },
+      teacherName: { type: string },
     },
   ],
   absentStatus: {
