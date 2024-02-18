@@ -232,7 +232,7 @@ app.post("/shuffle", async (req, res) => {
               const shuffleData = {
                 names: shuffleObjArray,
                 periodNumber: pNumber,
-                teacherName: teacherData.firstName,
+                teacherName: absentTeacher.firstName,
               };
 
               if (!teacherData.shuffleStudents) {
