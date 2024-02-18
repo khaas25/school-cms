@@ -232,6 +232,7 @@ app.post("/shuffle", async (req, res) => {
               const shuffleData = {
                 names: shuffleObjArray,
                 periodNumber: pNumber,
+                teacherName: teacherData.firstName,
               };
 
               if (!teacherData.shuffleStudents) {
@@ -434,8 +435,6 @@ app.put("/adminRequests/:id", async (req, res) => {
     res.status(500).send("Server Crashed");
   }
 });
-
-
 
 // //===============
 setInterval(async () => {

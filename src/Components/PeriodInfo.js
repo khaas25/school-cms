@@ -19,6 +19,7 @@ export default function PeriodInfo() {
 
   console.log(id);
   var location = useLocation();
+  //setI and i are used to go through period forms
   var [i, setI] = useState(0);
   var [currentPeriod, setCurrentPeriod] = useState(0);
 

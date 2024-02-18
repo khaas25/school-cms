@@ -32,9 +32,10 @@ export default function Signin() {
     axios
       .post(`${API.apiUri}/signin`, payload)
       .then((res) => {
-        console.log(res);
         NotificationManager.success("Login Successful");
         //if signin is successful the below items are displayed in localstorage
+        //AES encryption - storing data in database and people cant make sense of local storage.
+        //in parenthesis state which data you are trying to encrypt, then give it a secret key)
         localStorage.setItem("cms-login", true);
         localStorage.setItem(
           "cms-userName",
